@@ -37,9 +37,9 @@
         "other_text_thickness": 0.15,
         "other_text_upright": false,
         "pads": {
-          "drill": 1.2,
-          "height": 1.2,
-          "width": 1.2
+          "drill": 0.3,
+          "height": 0.45,
+          "width": 0.45
         },
         "silk_line_width": 0.1,
         "silk_text_italic": false,
@@ -444,7 +444,7 @@
     "pinned_symbol_libs": []
   },
   "meta": {
-    "filename": "Capstone_Signal_Processing.kicad_pro",
+    "filename": "Transmit-Receive-PCB.kicad_pro",
     "version": 1
   },
   "net_settings": {
@@ -589,7 +589,7 @@
   },
   "sheets": [
     [
-      "3db02a5b-c9ca-4b56-8f8e-e069599e18c6",
+      "d550a1c3-3501-4011-b9b2-fd819e828d2f",
       "Root"
     ]
   ],
