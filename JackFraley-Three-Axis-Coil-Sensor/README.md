@@ -1,21 +1,23 @@
-# Power Conditioning Block Projects
-This folder contains two KiCad hardware designs split by function.
+# Coil Array Block Project
+This folder contains a KiCad hardware design for a magnetic-field sensing block.
 
-## Projects
-### PowerBlock
-Power supply block containing only:
+## Project
+### CoilArrayBlock
+Analog sensing block containing only:
 
-- 5V buck converter: LM62460Q1 (LM62460QRPHRQ1)
-- 3.3V linear regulator: TPS7A94 (PTPS7A9401DSCR)
-- Comparator stage: TLV6710 (TLV6710DDCT)
+- Current transformer front end: CT-0705-HA
+- Instrumentation amplifier stage: AD8422 (AD8422ARMZ)
+- Gain-setting resistor network: R3 = 1.05k
+- Output filter stage: R4 = 2k and C5 = 10nF
+- Input/output connectors: JST B2B-XH-A (J1, J2, J3)
 
-### PowerConditioningBlock
-Precision conditioning/reference block containing:
-
-- Precision voltage reference: ADR4525 (ADR4525ARZ)
-- Low-noise LDO: TPS7A94 (PTPS7A9401DSCR)
-- Precision op-amp: OPA2211 (OPA2211AIDDAR)
+## Interfaces
+- `Env_array_magfield`: magnetic field input to the sensing front end
+- `Pwr_array_dcpwr`: `VCC` supply input
+- `Pwr_array_vref`: `Vref` reference input
+- `Array_sigproc_asig`: `Vout` analog signal output
 
 ## Repository Notes
-Each project includes KiCad source files (.kicad_sch, .kicad_pcb, .kicad_pro) and generated Gerbers.
-KiCad backup archives and local transient files are excluded via .gitignore.
+This project includes KiCad source files (`.kicad_sch`, `.kicad_pcb`, `.kicad_pro`) and generated Gerbers.
+Supporting documentation is included in `docs/`.
+KiCad backup archives and local transient files are excluded via `.gitignore`.
