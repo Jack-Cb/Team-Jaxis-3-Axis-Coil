@@ -1,6 +1,9 @@
 # Coil Array Block Project
 This folder contains a KiCad hardware design for a magnetic-field sensing block.
 
+## PCB Image
+![Coil Array PCB](CoilArrayPCB.png)
+
 ## Project
 ### CoilArrayBlock
 Analog sensing block containing only:
