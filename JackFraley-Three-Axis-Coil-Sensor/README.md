@@ -1,24 +1,21 @@
-# Coil Array Block
+# Power Conditioning Block Projects
+This folder contains two KiCad hardware designs split by function.
 
-Coil-array magnetic-field sensing block designed and implemented by Jack Fraley.
+## Projects
+### PowerBlock
+Power supply block containing only:
 
-## Overview
+- 5V buck converter: LM62460Q1 (LM62460QRPHRQ1)
+- 3.3V linear regulator: TPS7A94 (PTPS7A9401DSCR)
+- Comparator stage: TLV6710 (TLV6710DDCT)
 
-This repository contains the hardware design package for the Coil Array board, including source design files, fabrication outputs, and project documentation.
+### PowerConditioningBlock
+Precision conditioning/reference block containing:
 
-## Hardware Design Files
+- Precision voltage reference: ADR4525 (ADR4525ARZ)
+- Low-noise LDO: TPS7A94 (PTPS7A9401DSCR)
+- Precision op-amp: OPA2211 (OPA2211AIDDAR)
 
-- [CoilArrayBlock.kicad_sch](/Users/jackfraley/Downloads/Coil Array/hardware/kicad/CoilArrayBlock/CoilArrayBlock.kicad_sch)
-- [CoilArrayBlock.kicad_pcb](/Users/jackfraley/Downloads/Coil Array/hardware/kicad/CoilArrayBlock/CoilArrayBlock.kicad_pcb)
-- [CoilArrayBlock.kicad_pro](/Users/jackfraley/Downloads/Coil Array/hardware/kicad/CoilArrayBlock/CoilArrayBlock.kicad_pro)
-- [fp-lib-table](/Users/jackfraley/Downloads/Coil Array/hardware/kicad/CoilArrayBlock/fp-lib-table)
-- [JaxisSilkscreenLogo.kicad_sym](/Users/jackfraley/Downloads/Coil Array/hardware/kicad/CoilArrayBlock/JaxisSilkscreenLogo.kicad_sym)
-
-## Fabrication Outputs
-
-- [Gerber Manufacturing Files](/Users/jackfraley/Downloads/Coil Array/hardware/kicad/CoilArrayBlock/Gerber)
-- [Gerber Job File](/Users/jackfraley/Downloads/Coil Array/hardware/kicad/CoilArrayBlock/CoilArrayBlock-job.gbrjob)
-
-## Documentation
-
-- [Coil Array.pdf](/Users/jackfraley/Downloads/Coil Array/docs/Coil Array.pdf)
+## Repository Notes
+Each project includes KiCad source files (.kicad_sch, .kicad_pcb, .kicad_pro) and generated Gerbers.
+KiCad backup archives and local transient files are excluded via .gitignore.
