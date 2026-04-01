@@ -5,11 +5,9 @@ This folder contains a KiCad hardware design for a magnetic-field sensing block.
 ### CoilArrayBlock
 Analog sensing block containing only:
 
-- Current transformer front end: CT-0705-HA
+- Current transformer front end: CWS CT-0705-HA (CT-0705-HA)
 - Instrumentation amplifier stage: AD8422 (AD8422ARMZ)
-- Gain-setting resistor network: R3 = 1.05k
-- Output filter stage: R4 = 2k and C5 = 10nF
-- Input/output connectors: JST B2B-XH-A (J1, J2, J3)
+- Input/output connector stage: JST B2B-XH-A (B2B-XH-A)
 
 ## Interfaces
 - `Env_array_magfield`: magnetic field input to the sensing front end
