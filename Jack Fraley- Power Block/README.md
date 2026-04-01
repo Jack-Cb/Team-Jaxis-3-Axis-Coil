@@ -18,6 +18,14 @@ Precision conditioning/reference block containing:
 - Low-noise LDO: `TPS7A94` (PTPS7A9401DSCR)
 - Precision op-amp: `OPA2211` (OPA2211AIDDAR)
 
+## Images
+
+### `PowerBlock`
+![PowerBlock](Power-Block.png)
+
+### `PowerConditioningBlock`
+![PowerConditioningBlock](PowerConditioningBlock.png)
+
 ## Repository Notes
 
 - Each project includes KiCad source files (`.kicad_sch`, `.kicad_pcb`, `.kicad_pro`) and generated Gerbers.
