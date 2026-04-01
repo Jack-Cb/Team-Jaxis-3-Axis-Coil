@@ -14,9 +14,9 @@ Power supply block containing only:
 ### `PowerConditioningBlock`
 Precision conditioning/reference block containing:
 
-- `ADR4525` precision voltage reference (ADR4525ARZ)
-- `TPS7A94` low-noise LDO (PTPS7A9401DSCR)
-- `OPA2211` precision op-amp (OPA2211AIDDAR)
+- Precision voltage reference: `ADR4525` (ADR4525ARZ)
+- Low-noise LDO: `TPS7A94` (PTPS7A9401DSCR)
+- Precision op-amp: `OPA2211` (OPA2211AIDDAR)
 
 ## Repository Notes
 
