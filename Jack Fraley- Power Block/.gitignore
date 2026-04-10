@@ -1,0 +1,16 @@
+.DS_Store
+*~
+*.tmp
+
+# KiCad local/user files
+*.kicad_prl
+*.kicad_pro-bak
+*.kicad_sch-bak
+
+# KiCad generated artifacts
+*.net
+*.rpt
+
+# Project backup archives
+**/*-backups/
+**/*.zip
