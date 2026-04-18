@@ -142,7 +142,7 @@ void setup_ADC() {
   // CH_MAP0
   digitalWrite(chipSelectPin, LOW);
   SPI.transfer16(0b0000000010000011);
-  SPI.transfer16(0b0000000000011000); // AIN0(+)
+  SPI.transfer16(0b0000000000000001); // AIN0(+)
   //SPI.transfer(0b00000001); // AIN1(-)
   digitalWrite(chipSelectPin, HIGH);
 
@@ -150,23 +150,16 @@ void setup_ADC() {
   digitalWrite(chipSelectPin, LOW);
   delay(10);
   SPI.transfer16(0b0000000010000111);
-  SPI.transfer16(0b0000001000011000); // AIN2(+)
+  SPI.transfer16(0b0000001000000011); // AIN2(+)
   //SPI.transfer(0b00000011); // AIN3(-)
   digitalWrite(chipSelectPin, HIGH);
 
   // CH_MAP2
   digitalWrite(chipSelectPin, LOW);
   SPI.transfer16(0b0000000010001011);
-  SPI.transfer16(0b0000010000011000); // AIN4(+)
+  SPI.transfer16(0b0000010000000101); // AIN4(+)
   //SPI.transfer(0b00000101); // AIN5(-)
   digitalWrite(chipSelectPin, HIGH);
-
-  /* AFE0 Ascending
-  digitalWrite(chipSelectPin, LOW);
-  SPI.transfer16(0b0000000011000010);
-  SPI.transfer16(0b0110100100000000);
-  //SPI.transfer(0b01101001); 
-  digitalWrite(chipSelectPin, HIGH); */
 
   // AFE0 Descending
   digitalWrite(chipSelectPin, LOW);
@@ -190,30 +183,12 @@ void setup_ADC() {
   //SPI.transfer(0b01101001); 
   digitalWrite(chipSelectPin, HIGH);
 
-  // OFFSET0
-  digitalWrite(chipSelectPin, LOW);
+  digitalWrite(SS, LOW);
   delay(10);
-  SPI.transfer16(0b0000000011001010);
-  SPI.transfer(0b00110000);
-  SPI.transfer(0b00000000);
-  SPI.transfer(0b00000000);
-  digitalWrite(chipSelectPin, HIGH);
-
-  // OFFSET1
-  digitalWrite(chipSelectPin, LOW);
-  SPI.transfer16(0b0000000011011000);
-  SPI.transfer(0b11010000);
-  SPI.transfer(0b00000000);
-  SPI.transfer(0b00000000);
-  digitalWrite(chipSelectPin, HIGH);
-
-  // OFFSET2
-  digitalWrite(chipSelectPin, LOW);
-  SPI.transfer16(0b0000000011100110);
-  SPI.transfer(0b11010000);
-  SPI.transfer(0b00000000);
-  SPI.transfer(0b00000000);
-  digitalWrite(chipSelectPin, HIGH);
+  SPI.transfer16(0b0000000100110101); // VOLTAGE BIAS REG
+  SPI.transfer16(0b0000000000000000);
+  digitalWrite(SS, HIGH);
+  SPI.endTransaction(); 
 
 }
 
@@ -235,7 +210,7 @@ void loop() {
   Serial.print(data0);
   float voltage0 = (data0 * 5) / 16777216.0;
   Serial.print(", Voltage X: ");
-  Serial.println(voltage0, 4);
+  Serial.println(voltage0, 10);
   digitalWrite(chipSelectPin, HIGH);
 
   digitalWrite(chipSelectPin, LOW);
@@ -247,7 +222,7 @@ void loop() {
   Serial.print(data1);
   float voltage1 = (data1 * 5) / 16777216.0;
   Serial.print(", Voltage Y: ");
-  Serial.println(voltage1, 4);
+  Serial.println(voltage1, 10);
   digitalWrite(chipSelectPin, HIGH);
 
   digitalWrite(chipSelectPin, LOW);
@@ -259,7 +234,7 @@ void loop() {
   Serial.print(data2);
   float voltage2 = (data2 * 5) / 16777216.0;
   Serial.print(", Voltage Z: ");
-  Serial.println(voltage2, 4);
+  Serial.println(voltage2, 10);
   digitalWrite(chipSelectPin, HIGH);
 
 }

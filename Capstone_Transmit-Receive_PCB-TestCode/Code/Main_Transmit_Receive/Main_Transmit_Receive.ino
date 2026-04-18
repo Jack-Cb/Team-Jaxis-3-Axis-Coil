@@ -11,12 +11,14 @@ const char* password = "Coilcapstone"; // Must be at least 8 characters
 #define MISO 13
 #define SCK 12
 
-uint32_t spi_stream_a = 0;
+uint32_t spi_stream_rx = 0;
+float spi_stream_vx = 0.00000000;
 
 WebServer server(80);
 
 void setup() {
   Serial.begin(115200);
+  while (!Serial) delay(10);
   SPI.begin(SCK, MISO, MOSI, SS); 
   pinMode(SS, OUTPUT);
   digitalWrite(SS, HIGH);
@@ -38,26 +40,62 @@ void setup() {
 
   // 5. Standard WebServer route
   server.on("/", []() {
-    server.send(200, "text/plain", "Connected to ESP32-S3 HT40 SoftAP");
-    server.send(200, "text/plain", "Raw Data: ");
-    server.send(200, "text/plain", spi_stream_a);
+    String html = "<h1>ESP32-S3 Telemetry</h1>";
+    html += "<p><b>Raw X:</b> " + String(spi_stream_rx) + "</p>";
+    html += "<p><b>Volt X:</b> " + String(spi_stream_vx) + "V</p>";
+  
+    server.send(200, "text/html", html);
   });
 
   server.begin();
   Serial.print("AP IP Address: ");
   Serial.println(WiFi.softAPIP());
+
+  SPI.beginTransaction(SPISettings(16000000, MSBFIRST, SPI_MODE3));
+  digitalWrite(SS, LOW);
+  delay(10);
+  SPI.transfer16(0b0000000010000011); //ADDRESS
+  SPI.transfer16(0b0000000000000001); //DATA
+  digitalWrite(SS, HIGH);
+
+  digitalWrite(SS, LOW);
+  delay(10);
+  SPI.transfer16(0b0000000011000011); // AFE0
+  SPI.transfer16(0b0000000001101001);
+  digitalWrite(SS, HIGH);
+
+  digitalWrite(SS, LOW);
+  delay(10);
+  SPI.transfer16(0b0000000100110101); // VOLTAGE BIAS REG
+  SPI.transfer16(0b0000000000000000);
+  digitalWrite(SS, HIGH);
+  SPI.endTransaction(); 
+
 }
 
 void loop() {
-  SPI.beginTransaction(SPISettings(10000000, MSBFIRST, SPI_MODE0));
+  SPI.beginTransaction(SPISettings(16000000, MSBFIRST, SPI_MODE3));
   
-  digitalWrite(SS, LOW);    // Select device
-  SPI.transfer(0x00);       // Trigger SCLK for 8 clock cycles
-  digitalWrite(SS, HIGH);   // Deselect device
+  digitalWrite(SS, LOW);
+  SPI.transfer16(0b0100000000000011); 
+  uint8_t id = SPI.transfer(0x00);
+  digitalWrite(SS, HIGH);
+  Serial.print("ID_VAL: "); // SHOULD BE 7 (CHIP_TYPE)
+  Serial.println(id, HEX);
   
+  digitalWrite(SS, LOW);
+  SPI.transfer16(0b0100000000101010); 
+  spi_stream_rx = 0;
+  spi_stream_rx |= (uint32_t)SPI.transfer(0x00) << 16;
+  spi_stream_rx |= (uint32_t)SPI.transfer(0x00) << 8;
+  spi_stream_rx |= (uint32_t)SPI.transfer(0x00);
+  spi_stream_vx = (spi_stream_rx * 5) / 16777216.00000000;
+  Serial.print(spi_stream_rx);
+  Serial.print(", Voltage X: ");
+  Serial.println(spi_stream_vx, 10);
   SPI.endTransaction(); 
-  spi_stream_a |= (uint32_t)SPI.transfer(0x00) << 16;
-  spi_stream_a |= (uint32_t)SPI.transfer(0x00) << 8;
-  spi_stream_a |= (uint32_t)SPI.transfer(0x00);
+
   server.handleClient();
+  
+  digitalWrite(SS, HIGH);
 }

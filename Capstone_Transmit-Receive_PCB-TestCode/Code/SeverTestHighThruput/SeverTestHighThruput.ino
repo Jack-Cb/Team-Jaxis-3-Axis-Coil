@@ -2,7 +2,7 @@
 #include <WebServer.h>
 #include "esp_wifi.h"
 
-const char* ssid = "JAXIS";
+const char* ssid = "TeamJaxis";
 const char* password = "Coilcapstone"; // Must be at least 8 characters
 
 WebServer server(80);
