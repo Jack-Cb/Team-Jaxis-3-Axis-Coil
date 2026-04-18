@@ -54,6 +54,7 @@ void setup() {
   SPI.beginTransaction(SPISettings(16000000, MSBFIRST, SPI_MODE3));
   digitalWrite(SS, LOW);
   delay(10);
+  // CH MAP 0
   SPI.transfer16(0b0000000010000011); //ADDRESS
   SPI.transfer16(0b0000000000000001); //DATA
   digitalWrite(SS, HIGH);
