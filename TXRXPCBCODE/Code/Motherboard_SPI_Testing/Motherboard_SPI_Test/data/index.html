@@ -24,10 +24,11 @@
 </head>
 <body>
     <div class="telemetry">
-        <div><div class="l">Magnitude</div><div id="mag" class="v">0.00</div></div>
-        <div><div class="l">Altitude</div><div id="alt" class="v">0&deg;</div></div>
-        <div><div class="l">Azimuth</div><div id="azi" class="v">0&deg;</div></div>
-    </div>
+		<div><div class="l">Magnitude</div><div id="mag" class="v">0.00</div></div>
+		<div><div class="l">Altitude</div><div id="alt" class="v">0&deg;</div></div>
+		<div><div class="l">Azimuth</div><div id="azi" class="v">0&deg;</div></div>
+		<div><div class="l">Rate</div><div id="rate" class="v">0</div><div class="l">V/S</div></div>
+	</div>
 
     <div id="canvas-container"></div>
 
@@ -51,15 +52,19 @@
 		container.appendChild(renderer.domElement);
 
         // 2. Add Visual Helpers (Grid & Axes)
-        const grid = new THREE.GridHelper(10, 10, 0x444444, 0x222222);
-		// The Grid is horizontal by default in Three.js (XZ plane), 
-		// but we want the XY plane to be our "ground" (Z is Vertical)
+		const grid = new THREE.GridHelper(30, 20, 0x444444, 0x222222);
 		grid.rotation.x = Math.PI / 2; 
 		scene.add(grid);
 		
 		// Axes: Red=X (0° Azi), Green=Y (90° Azi), Blue=Z (Vertical/Alt)
-		const axesHelper = new THREE.AxesHelper(5);
+		const axesHelper = new THREE.AxesHelper(15);
 		scene.add(axesHelper);
+		
+		const blueMaterial = new THREE.LineBasicMaterial({ color: 0x2222aa });
+		const points = [new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 0, -15)];
+		const geometry = new THREE.BufferGeometry().setFromPoints(points);
+		const lineDown = new THREE.Line(geometry, blueMaterial);
+		scene.add(lineDown);
 
         // 3. Vector (ArrowHelper)
         const dir = new THREE.Vector3(1, 1, 1).normalize();
@@ -90,32 +95,35 @@
 		}
 
 		// 3. Update Label Positions (Slightly further out so they don't overlap axes)
-		createLabel('X (0° Azi)', new THREE.Vector3(6, 0, 0), '#ff4444');
-		createLabel('Y (90° Azi)', new THREE.Vector3(0, 6, 0), '#44ff44');
-		createLabel('Z (Altitude)', new THREE.Vector3(0, 0, 6), '#4444ff');
-		createLabel('0° Ground', new THREE.Vector3(3, 3, 0.2), '#888888');
+		createLabel('X (0° Azi)', new THREE.Vector3(16, 0, 0), '#ff4444');
+		createLabel('Y (90° Azi)', new THREE.Vector3(0, 16, 0), '#44ff44');
+		createLabel('Z (Altitude)', new THREE.Vector3(0, 0, 16), '#4444ff');
+		createLabel('-Z', new THREE.Vector3(0, 0, -16), '#2222aa');
 
-
-		camera.position.set(6, -6, 6); // Changed from 8, -8, 8 to zoom in
+		camera.position.set(22, -22, 18); 
 		camera.up.set(0, 0, 1);
 		camera.lookAt(0, 0, 0);
 
-
         // 4. Data Polling
         function updateVector(alt, azi, mag) {
-            const rAlt = alt * (Math.PI / 180);
-            const rAzi = azi * (Math.PI / 180);
-            const length = Math.max(0.1, mag * 2); // Scale mag to world units
-            
-            const newDir = new THREE.Vector3(
-                Math.cos(rAlt) * Math.cos(rAzi),
-                Math.cos(rAlt) * Math.sin(rAzi),
-                Math.sin(rAlt)
-            );
-            
-            arrow.setDirection(newDir.normalize());
-            arrow.setLength(length);
-        }
+			const rAlt = alt * (Math.PI / 180);
+			const rAzi = azi * (Math.PI / 180);
+    
+			// Scale: If mag is 15, length is 15 (hitting the axis edge)
+			const length = Math.min(15, mag); 
+    
+			const newDir = new THREE.Vector3(
+				Math.cos(rAlt) * Math.cos(rAzi),
+				Math.cos(rAlt) * Math.sin(rAzi),
+				Math.sin(rAlt)
+			);
+    
+			arrow.setDirection(newDir.normalize());
+			arrow.setLength(length);
+		}
+		
+		let vectorCount = 0;
+		let lastTime = performance.now();
 		
 		window.updateFreq = function() {
 			let val = document.getElementById('freqIn').value;
@@ -124,13 +132,26 @@
 		}
 
         setInterval(() => {
-            fetch('/data').then(r => r.json()).then(d => {
-                document.getElementById('mag').innerText = d.mag.toFixed(2);
-                document.getElementById('alt').innerText = d.alt + "°";
-                document.getElementById('azi').innerText = d.azi + "°";
-                updateVector(d.alt, d.azi, d.mag);
-            }).catch(() => {});
-        }, 100);
+			fetch('/data').then(r => r.json()).then(d => {
+				// Increment counter for rate
+				vectorCount++;
+        
+				document.getElementById('mag').innerText = d.mag.toFixed(3) + "ft";
+				document.getElementById('alt').innerText = d.alt + "°";
+				document.getElementById('azi').innerText = d.azi + "°";
+				updateVector(d.alt, d.azi, d.mag);
+			}).catch(() => {});
+		}, 25);
+		
+		setInterval(() => {
+			const now = performance.now();
+			const dt = (now - lastTime) / 1000;
+			const vps = Math.round(vectorCount / dt);
+			document.getElementById('rate').innerText = vps;
+    
+			vectorCount = 0;
+			lastTime = now;
+		}, 1000);
 
         function animate() {
             requestAnimationFrame(animate);
