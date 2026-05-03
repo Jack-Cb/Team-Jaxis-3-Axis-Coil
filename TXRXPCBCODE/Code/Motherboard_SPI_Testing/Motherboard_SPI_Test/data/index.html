@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>3D Vector Radar - Three.js</title>
+    <style>
+        body { font-family: sans-serif; background: #121212; color: #0f8; margin: 0; display: flex; flex-direction: column; align-items: center; }
+        .telemetry { margin-top: 20px; text-align: center; display: flex; gap: 40px; }
+        .v { font-size: 2em; font-weight: bold; }
+        .l { color: #888; font-size: 0.8em; text-transform: uppercase; }
+        #canvas-container { 
+			width: 95vw;          
+			max-width: 1000px; 
+			height: 700px;        
+			border: 1px solid #333; 
+			border-radius: 15px; 
+			background: #000;
+			margin-bottom: 20px;
+		}
+        .controls { margin-bottom: 30px; text-align: center; background: #1e1e1e; padding: 20px; border-radius: 10px; }
+        input { background: #333; color: #0f8; border: 1px solid #444; padding: 10px; border-radius: 4px; width: 150px; }
+        .btn { background: #0f8; color: #121212; border: none; padding: 10px 20px; border-radius: 4px; font-weight: bold; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="telemetry">
+        <div><div class="l">Magnitude</div><div id="mag" class="v">0.00</div></div>
+        <div><div class="l">Altitude</div><div id="alt" class="v">0&deg;</div></div>
+        <div><div class="l">Azimuth</div><div id="azi" class="v">0&deg;</div></div>
+    </div>
+
+    <div id="canvas-container"></div>
+
+    <div class="controls">
+        <div class="l" style="margin-bottom: 10px;">Set Target Frequency (Hz)</div>
+        <input type="number" id="freqIn" placeholder="0000">
+        <button onclick="updateFreq()" class="btn">Update</button>
+    </div>
+
+    <!-- Three.js Library -->
+    <script type="module">
+        import * as THREE from './three.module.js'; 
+
+        // 1. Scene Setup
+        const container = document.getElementById('canvas-container');
+		const scene = new THREE.Scene();
+		const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+		const renderer = new THREE.WebGLRenderer({ antialias: true });
+		renderer.setSize(container.clientWidth, container.clientHeight);
+		renderer.setPixelRatio(window.devicePixelRatio);
+		container.appendChild(renderer.domElement);
+
+        // 2. Add Visual Helpers (Grid & Axes)
+        const grid = new THREE.GridHelper(10, 10, 0x444444, 0x222222);
+		// The Grid is horizontal by default in Three.js (XZ plane), 
+		// but we want the XY plane to be our "ground" (Z is Vertical)
+		grid.rotation.x = Math.PI / 2; 
+		scene.add(grid);
+		
+		// Axes: Red=X (0° Azi), Green=Y (90° Azi), Blue=Z (Vertical/Alt)
+		const axesHelper = new THREE.AxesHelper(5);
+		scene.add(axesHelper);
+
+        // 3. Vector (ArrowHelper)
+        const dir = new THREE.Vector3(1, 1, 1).normalize();
+        const origin = new THREE.Vector3(0, 0, 0);
+        const arrow = new THREE.ArrowHelper(dir, origin, 1, 0x00ff88, 0.2, 0.1);
+        scene.add(arrow);
+		
+		function createLabel(text, pos, color) {
+			const canvas = document.createElement('canvas');
+			const ctx = canvas.getContext('2d');
+			// Larger canvas to prevent clipping
+			canvas.width = 256; 
+			canvas.height = 128;
+    
+			ctx.fillStyle = color;
+			ctx.font = 'Bold 32px Arial';
+			ctx.textAlign = 'center'; // Center the text in the sprite box
+			ctx.textBaseline = 'middle';
+			ctx.fillText(text, 128, 64);
+    
+			const texture = new THREE.CanvasTexture(canvas);
+			const spriteMaterial = new THREE.SpriteMaterial({ map: texture });
+			const sprite = new THREE.Sprite(spriteMaterial);
+    
+			sprite.position.copy(pos);
+			sprite.scale.set(3, 1.5, 1); // Increased scale for visibility
+			scene.add(sprite);
+		}
+
+		// 3. Update Label Positions (Slightly further out so they don't overlap axes)
+		createLabel('X (0° Azi)', new THREE.Vector3(6, 0, 0), '#ff4444');
+		createLabel('Y (90° Azi)', new THREE.Vector3(0, 6, 0), '#44ff44');
+		createLabel('Z (Altitude)', new THREE.Vector3(0, 0, 6), '#4444ff');
+		createLabel('0° Ground', new THREE.Vector3(3, 3, 0.2), '#888888');
+
+
+		camera.position.set(6, -6, 6); // Changed from 8, -8, 8 to zoom in
+		camera.up.set(0, 0, 1);
+		camera.lookAt(0, 0, 0);
+
+
+        // 4. Data Polling
+        function updateVector(alt, azi, mag) {
+            const rAlt = alt * (Math.PI / 180);
+            const rAzi = azi * (Math.PI / 180);
+            const length = Math.max(0.1, mag * 2); // Scale mag to world units
+            
+            const newDir = new THREE.Vector3(
+                Math.cos(rAlt) * Math.cos(rAzi),
+                Math.cos(rAlt) * Math.sin(rAzi),
+                Math.sin(rAlt)
+            );
+            
+            arrow.setDirection(newDir.normalize());
+            arrow.setLength(length);
+        }
+		
+		window.updateFreq = function() {
+			let val = document.getElementById('freqIn').value;
+			if(!val) return;
+			fetch(`/setFreq?val=${val}`).then(r => r.text()).then(msg => alert(msg));
+		}
+
+        setInterval(() => {
+            fetch('/data').then(r => r.json()).then(d => {
+                document.getElementById('mag').innerText = d.mag.toFixed(2);
+                document.getElementById('alt').innerText = d.alt + "°";
+                document.getElementById('azi').innerText = d.azi + "°";
+                updateVector(d.alt, d.azi, d.mag);
+            }).catch(() => {});
+        }, 100);
+
+        function animate() {
+            requestAnimationFrame(animate);
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        // Responsive Resize
+        window.addEventListener('resize', () => {
+            const w = container.clientWidth;
+            const h = container.clientHeight;
+            renderer.setSize(w, h);
+            camera.aspect = w / h;
+            camera.updateProjectionMatrix();
+        });
+    </script>
+</body>
+</html>
