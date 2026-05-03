@@ -6,12 +6,14 @@
 #define SCK 12
 
 void setup() {
+  delay(8000);
   pinMode(SS, OUTPUT);
   digitalWrite(SS, HIGH);
-  SPI.begin(SCK, MISO, MOSI, SS);
+  
+  SPI.begin();
   
   // AD4170 typically uses SPI Mode 3 (CPOL=1, CPHA=1)
-  SPI.beginTransaction(SPISettings(16000000, MSBFIRST, SPI_MODE3));
+  SPI.beginTransaction(SPISettings(200000, MSBFIRST, SPI_MODE3));
   
   Serial.begin(115200);
   setup_ADC();
