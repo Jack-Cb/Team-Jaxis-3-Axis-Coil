@@ -1,0 +1,46 @@
+Sample rate Max is 500k Samples/Second but split between 3 channels
+Resolution 24 bits
+Max Distance "Not sure yet"
+
+The idea is:
+
+Program #1 Signal Generator
+Generate 3 seperate wave forms
+|xu[n]|+|yu[n]|+|zu[n]| = h[n], where xu[n] = x[n]/(|<x,y,z>|)  0 <= h[n] <= 3
+
+Generate code to vary signals at some expected rate
+Vary amplitude, 0 - 2^12. 2^12 bias so, 2^12 represents 0V
+Vary frequency, Max signal frequency is 1Khz, 
+
+Generate a copy of the signal but with noise added. This should be the one sent to the DSP and the original should be sent to the analysis
+Sample each wave form at a frequency of 500k/3, alternate T_s time between x, y, z to match ADC
+Send data through socket to signal processor program to simulate SPI
+Send data through socket to analysis program
+
+Program #2 Real SPI management version
+Basically just packages SPI values into a vector for the DSP program
+Configures the SPI interfaces
+
+Program #3 DSP
+Recieve 3 packages of 24 bytes
+Filter
+
+Program #4 Transmit Handling,
+Recieve information about frequency selection and transmit it to the DSP program
+
+Program #5 Anaylsis
+Recieve the original signal, (noisy signal?), and dsp signal.
+Perform various analysis to determine the effectiveness of the dsp program
+
+
+
+
+
+
+
+
+
+
+
+
+
