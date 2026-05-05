@@ -13,7 +13,8 @@ build.sh: build script, should handle everything
 axis.h: function headers, some global functions
 frontend1.cpp: handles one of the coil sensors SPI and communication with DSP code
 frontend2.cpp: same as above but second coil
-transmit.cpp: sends vectors to esp32
+transmit.cpp: sends vectors to esp32 and recieves frequency
+calculator.py: particle filter that computes vector magnitude and direction from sensor data from coil 1 and 2.
 signals.py: somewhat complete simulator program
 dsp.cpp: handles lock in detection. Acts as a central server between all components.
 
