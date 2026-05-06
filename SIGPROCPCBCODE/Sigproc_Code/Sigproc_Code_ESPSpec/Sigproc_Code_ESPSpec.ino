@@ -95,7 +95,7 @@ void setup_ADC() {
   digitalWrite(vspi->pinSS(), LOW);
   //delay(10);
   vspi->transfer16(0b0000000011000011);
-  vspi->transfer16(0b0000000001100000);
+  vspi->transfer16(0b0000000001101001);
   //vspi->transfer(0b01101001); 
   digitalWrite(vspi->pinSS(), HIGH); 
   vspi->endTransaction();
