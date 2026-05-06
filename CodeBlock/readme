@@ -1,0 +1,50 @@
+Austin Arnold Capstone
+as of 5/5/2026
+
+Directory:
+New_framework - Contains the primary working code for the raspberry pi.
+testing - used for spi tests
+old - old stuff 
+laptop_version - code from when I didn't have access to the pi but wanted to work
+
+
+!!!New_framework!!!
+build.sh: build script, should handle everything
+axis.h: function headers, some global functions
+frontend1.cpp: handles one of the coil sensors SPI and communication with DSP code
+frontend2.cpp: same as above but second coil
+transmit.cpp: sends vectors to esp32 and recieves frequency
+calculator.py: particle filter that computes vector magnitude and direction from sensor data from coil 1 and 2.
+signals.py: somewhat complete simulator program
+dsp.cpp: handles lock in detection. Acts as a central server between all components.
+
+
+Architecture:
+						Transmit.cpp
+							 |  ^
+					freq	 |  | vectors
+                     (1)     |  |   (3)
+                             |  |
+							\/  |
+Frontend 1,  (data) --2/-> DSP.cpp 
+               (1)           |  ^
+                             |  |
+							 |  |
+						     |  |
+          (processed data)   |  | vectors
+                   (2)      \/  |   (3)
+					     Calculator.py
+
+
+
+
+
+
+
+
+
+
+
+
+
+
