@@ -32,11 +32,11 @@ static uint8_t rxbuf[NUM_BYTES] __attribute__((aligned(4)));
 
 void setup() {
     Serial.begin(115200);
-    while (!Serial) delay(10);
+    // while (!Serial) delay(10);
     delay(500);
 
     if(!LittleFS.begin(true)){
-      Serial.println("An Error has occurred while mounting LittleFS");
+      //Serial.println("An Error has occurred while mounting LittleFS");
       return;
     }
 
@@ -117,13 +117,13 @@ void loop() {
   }
 
   // t.trans_len tells you how many bits the master actually clocked
-  Serial.printf("trans_len: %d bits (expected %d)\n", t.trans_len, NUM_BYTES * 8);
+  /*Serial.printf("trans_len: %d bits (expected %d)\n", t.trans_len, NUM_BYTES * 8);
 
   Serial.print("RX: ");
   for (int i = 0; i < NUM_BYTES; i++) {
     Serial.printf("%02X ", rxbuf[i]);
   }
-  Serial.println();
+  Serial.println(); */
     
   int mag_tensones = rxbuf[0];
   int mag_tensplace = rxbuf[1];
@@ -140,9 +140,9 @@ void loop() {
   azimuth_ang = azimuth_one + azimuth_two;
   altitude_ang  =  altitude_one + altitude_two;
 
-  Serial.print("TX was: ");
+  /*Serial.print("TX was: ");
   for (int i = 0; i < NUM_BYTES; i++) {
       Serial.printf("%02X ", txbuf[i]);
   }
-  Serial.println();
+  Serial.println();*/
 }
